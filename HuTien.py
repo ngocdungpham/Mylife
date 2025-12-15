@@ -1,3 +1,5 @@
+import library
+
 class CoinBank:
     name: str
     goal: str

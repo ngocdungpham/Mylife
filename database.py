@@ -1,3 +1,4 @@
+from binascii import Error
 import mysql.connector
 
 import GiaoDich
@@ -5,16 +6,31 @@ import GiaoDich
 class DatabaseManager:
     "class quản lý kết nối và truy vấn"
 
-    def __int__ (self, host, user, password, database):
-        self.conn=mysql.connector.connect(
-            host=host,
-            user=user,
-            password=password,
-            database=database
-        )
-        self.create_tables()
+    def __init__ (self, host, user, password, database):
+        self.conn = None
+        try:
+            self.conn=mysql.connector.connect(
+                host=host,
+                user=user,
+                password=password,
+                database=database
+            )
+            self.create_tables()
+
+            if self.conn.is_connected():
+                print("Finish connect")
+                self.create_tables()
+            else:
+                print("connect fail, check database")
+
+        except Error as e:
+            print("Connect fail database. Error: {e}")
+            self.conn = None
 
     def create_tables(self):
+        if self.conn is None or not self.conn.is_connected():
+            print("Skip create table because dont connect database")
+            return
         cursor = self.conn.cursor()
 
         cursor.execute("""
@@ -43,7 +59,7 @@ class DatabaseManager:
 
     def add_transaction(self, transaction: GiaoDich):
         cursor = self.conn.cursor()
-        sql = "INSERT INTO transactions(amount, category, catalog, date, note) VALUES (%s, %s, %s, %s, %s)"
+        sql = "INSERT INTO transaction(amount, category, catalog, date, note) VALUES (%s, %s, %s, %s, %s)"
 
         val = (transaction.amount,
                 transaction.category,
