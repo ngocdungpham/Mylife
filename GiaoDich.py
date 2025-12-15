@@ -3,7 +3,7 @@ import library
 class GiaoDich:
     amount: float
     category: str
-    date: str
     catalog: str
+    date: str
     note: str=""
     id: Optional[int] = None

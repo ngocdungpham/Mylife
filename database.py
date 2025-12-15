@@ -1,15 +1,17 @@
 import mysql.connector
 
+import GiaoDich
+
 class DatabaseManager:
     "class quản lý kết nối và truy vấn"
 
     def __int__ (self, host, user, password, database):
-        self.conn=mysql.connector.connect{
+        self.conn=mysql.connector.connect(
             host=host,
             user=user,
             password=password,
             database=database
-        }
+        )
         self.create_tables()
 
     def create_tables(self):
@@ -37,3 +39,17 @@ class DatabaseManager:
             """
         )
         self.conn.commit()
+
+
+    def add_transaction(self, transaction: GiaoDich):
+        cursor = self.conn.cursor()
+        sql = "INSERT INTO transactions(amount, category, catalog, date, note) VALUES (%s, %s, %s, %s, %s)"
+
+        val = (transaction.amount,
+                transaction.category,
+                transaction.catalog,
+                transaction.date,
+                transaction.note) 
+        cursor.execute(sql, val)
+        self.conn.commit()
+        print(f"Saved transaction in MYSQL: {transaction.category} {transaction.amount}")

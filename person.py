@@ -24,7 +24,7 @@ class Person:
         else:
             self.current -= amount_paid
     
-    def 
+    
 
 
 ZuniHaZY = Person("Pham Ngoc Dung")
