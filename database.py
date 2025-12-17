@@ -1,7 +1,9 @@
 from binascii import Error
+from typing import List
 import mysql.connector
 
-import GiaoDich
+from GiaoDich import GiaoDich
+from HuTien import CoinBank
 
 class DatabaseManager:
     "class quản lý kết nối và truy vấn"
@@ -56,16 +58,68 @@ class DatabaseManager:
         )
         self.conn.commit()
 
+    def add_jar(self, jar: CoinBank):
+        cursor = self.conn.cursor()
+        sql = "INSERT INTO jars(name_jars, goal_jars, current_jars) VALUES (%s, %s, %s)"
+
+        val = (jar.name,
+               jar.goal,
+               jar.current_balance)
+        cursor.execute(sql, val)
+        self.conn.commit()
+        print("Saved new jar in MYSQL:", f"jar: {jar.name}, current_balance: {jar.current_balance}", end="\n")
 
     def add_transaction(self, transaction: GiaoDich):
         cursor = self.conn.cursor()
-        sql = "INSERT INTO transaction(amount, category, catalog, date, note) VALUES (%s, %s, %s, %s, %s)"
+        sql = "INSERT INTO transaction(amount_money, category, catalog, date_transaction, note) VALUES (%s, %s, %s, %s, %s)"
 
-        val = (transaction.amount,
+        val = (transaction.amount_money,
                 transaction.category,
                 transaction.catalog,
-                transaction.date,
+                transaction.date_transaction,
                 transaction.note) 
         cursor.execute(sql, val)
         self.conn.commit()
-        print(f"Saved transaction in MYSQL: {transaction.category} {transaction.amount}")
+        print(f"Saved transaction in MYSQL: category->{transaction.category} amount->{transaction.amount_money}")
+
+    def get_all_jars(self) -> List[CoinBank]:
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT id, name_jars, goal_jars, current_jars FROM jars")
+        rows = cursor.fetchall()
+
+        list_jars = []
+        for r in rows:
+            jar = CoinBank()
+            jar.id = r[0]
+            jar.name = r[1]
+            jar.goal = r[2]
+            jar.current_balance = r[3]
+            list_jars.append(jar)
+        
+        return list_jars
+    
+    def get_all_transactions(self) -> List[GiaoDich]:
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT id, amount_money, category, catalog, date_transaction, note FROM transaction")
+        rows = cursor.fetchall()
+
+        list_transaction = []
+
+        for r in rows:
+            transaction = GiaoDich()
+            transaction.amount_money = r[0]
+            transaction.catalog = r[1]
+            transaction.category = r[2]
+            transaction.date_transaction = r[3]
+            transaction.note = r[4]
+            list_transaction.append(transaction)
+
+        return list_transaction
+    
+    def update_jar_balance(self, jar: CoinBank):
+        cursor = self.conn.cursor()
+        sql = "UPDATE jars SET current_jars = %s WHERE id = %s"
+        val = (jar.current_balance, jar.id)
+        cursor.execute(sql, val)
+        self.conn.commit()
+        print(f"Update balance of jar: {jar.name} trong DB")

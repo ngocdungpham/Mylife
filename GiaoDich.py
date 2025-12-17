@@ -1,9 +1,10 @@
 import library
 
 class GiaoDich:
-    amount: float
+    id: int
+    amount_money: float
     category: str
     catalog: str
-    date: str
+    date_transaction: str
     note: str=""
-    id: Optional[int] = None
+    # id: Optional[int] = None

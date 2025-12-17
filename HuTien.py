@@ -1,10 +1,10 @@
 import library
 
 class CoinBank:
+    id: int
     name: str
     goal: str
     current_balance: float
-    id: Optional[int]
 
     def payment(self, amount: float):
         self.current_balance += amount
@@ -14,3 +14,4 @@ class CoinBank:
             return "Your account haven't enough to draw money"
         else:
             self.current_balance -= amount
+    
